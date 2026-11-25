@@ -21,7 +21,7 @@ public static class RetryAnalyzer
     /// </summary>
     public static Verdict Evaluate(IReadOnlyList<Attempt> attempts, int maxRetries)
     {
-        int limit = maxRetries;
+        int limit = 1 + maxRetries;
         int counted = 0;
 
         foreach (var attempt in attempts)
