@@ -21,21 +21,9 @@ public static class RetryAnalyzer
     /// </summary>
     public static Verdict Evaluate(IReadOnlyList<Attempt> attempts, int maxRetries)
     {
-        int limit = maxRetries;
-        int counted = 0;
-
-        foreach (var attempt in attempts)
-        {
-            if (attempt.Outcome == "Skip")
-                continue;
-            if (counted >= limit)
-                break;
-
-            counted++;
-            if (attempt.Outcome == "Pass")
-                return counted == 1 ? Verdict.Passed : Verdict.Flaky;
-        }
-
-        return counted == 0 ? Verdict.NotRun : Verdict.Failed;
+        var window = attempts.Take(maxRetries).ToList();
+        if (window.Count == 0) return Verdict.NotRun;
+        if (window[0].Outcome == "Pass") return Verdict.Passed;
+        return window.Any(a => a.Outcome == "Pass") ? Verdict.Flaky : Verdict.Failed;
     }
 }
